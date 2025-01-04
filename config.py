@@ -2,8 +2,8 @@
 BOT_TOKEN = "6750957059:AAFvd3mez21vumWuV8jMaG3aOBW55_eGTKM"
 
 # API ID and API Hash from my.telegram.org
-API_ID = 123456  # Replace with your API ID
-API_HASH = "your_api_hash"  # Replace with your API Hash
+API_ID = 23990433  # Replace with your API ID
+API_HASH = "e6c4b6ee1933711bc4da9d7d17e1eb20"  # Replace with your API Hash
 
 # ID of the Telegram channel to monitor (e.g., -1001234567890)
 CHANNEL_ID = -1001870015374
