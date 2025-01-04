@@ -4,6 +4,7 @@ from pyrogram.errors import ChatAdminRequired, RPCError
 from datetime import datetime
 from config import BOT_TOKEN, API_ID, API_HASH, CHANNEL_ID, LOGS_CHANNEL_ID, OWNER_ID, BAN_LIST_FILE
 
+# Initialize the bot client
 app = Client(
     "autoban_bot",
     bot_token=BOT_TOKEN,
@@ -38,18 +39,17 @@ async def autoban(client, message):
         
         if user_id in ban_list:
             try:
-                await client.ban_chat_member(CHANNEL_ID, user_id)
+                await client.kick_chat_member(CHANNEL_ID, user_id)
                 log_message = (
                     f"🚫 **User Banned (Preemptive)**\n"
                     f"**Name:** {user_name}\n"
                     f"**User ID:** `{user_id}`\n"
                     f"**Joined At:** {join_time}\n"
-                    f"**Channel:** `{CHANNEL_ID}`"
                 )
                 await client.send_message(LOGS_CHANNEL_ID, log_message)
                 print(log_message)
             except ChatAdminRequired:
-                print("Bot is not an admin!")
+                print("Bot is not an admin or lacks Ban Users permission!")
             except RPCError as e:
                 print(f"Error banning user: {e}")
 
@@ -90,3 +90,4 @@ async def manage_ban_list(client, message):
 if __name__ == "__main__":
     print("Starting Autoban Bot with Ban List feature...")
     app.run()
+
