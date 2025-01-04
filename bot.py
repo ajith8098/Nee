@@ -2,6 +2,7 @@ import os
 from pyrogram import Client, filters
 from pyrogram.errors import ChatAdminRequired, RPCError
 from datetime import datetime
+import asyncio
 from config import BOT_TOKEN, API_ID, API_HASH, CHANNEL_ID, LOGS_CHANNEL_ID, OWNER_ID, BAN_LIST_FILE
 
 # Initialize the bot client
@@ -49,9 +50,40 @@ async def autoban(client, message):
                 await client.send_message(LOGS_CHANNEL_ID, log_message)
                 print(log_message)
             except ChatAdminRequired:
-                print("Bot is not an admin or lacks Ban Users permission!")
+                error_message = "Bot lacks permissions to ban users!"
+                await client.send_message(OWNER_ID, error_message)
+                print(error_message)
             except RPCError as e:
                 print(f"Error banning user: {e}")
+
+# --- Periodic Member Scan ---
+async def periodic_member_scan():
+    global ban_list
+    while True:
+        try:
+            # Get list of channel members
+            async for member in app.get_chat_members(CHANNEL_ID):
+                user_id = str(member.user.id)
+                if user_id in ban_list:
+                    try:
+                        await app.kick_chat_member(CHANNEL_ID, user_id)
+                        log_message = (
+                            f"🚫 **User Banned (Periodic Check)**\n"
+                            f"**User ID:** `{user_id}`\n"
+                        )
+                        await app.send_message(LOGS_CHANNEL_ID, log_message)
+                        print(log_message)
+                    except ChatAdminRequired:
+                        error_message = "Bot lacks permissions to ban users during periodic scan!"
+                        await app.send_message(OWNER_ID, error_message)
+                        print(error_message)
+                    except RPCError as e:
+                        print(f"Error banning user during periodic scan: {e}")
+        except Exception as e:
+            print(f"Error during periodic scan: {e}")
+        
+        # Wait 60 seconds before next scan
+        await asyncio.sleep(60)
 
 # --- Admin Commands ---
 @app.on_message(filters.command(["addban", "removeban", "banlist"]) & filters.user(OWNER_ID))
@@ -87,7 +119,10 @@ async def manage_ban_list(client, message):
         else:
             await message.reply("❌ The ban list is currently empty.")
 
+# Start the bot and periodic task
 if __name__ == "__main__":
-    print("Starting Autoban Bot with Ban List feature...")
-    app.run()
+    print("Starting Autoban Bot with Periodic Scan feature...")
+    app.start()
+    app.loop.create_task(periodic_member_scan())
+    app.idle()
 
