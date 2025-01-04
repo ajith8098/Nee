@@ -2,12 +2,15 @@ import os
 from pyrogram import Client, filters
 from pyrogram.errors import ChatAdminRequired, RPCError
 from datetime import datetime
-from config import BOT_TOKEN, CHANNEL_ID, LOGS_CHANNEL_ID, OWNER_ID, BAN_LIST_FILE
+from config import BOT_TOKEN, API_ID, API_HASH, CHANNEL_ID, LOGS_CHANNEL_ID, OWNER_ID, BAN_LIST_FILE
 
-# Initialize the bot client
+from config import BOT_TOKEN, 
+
 app = Client(
     "autoban_bot",
     bot_token=BOT_TOKEN,
+    api_id=API_ID,
+    api_hash=API_HASH,
 )
 
 # Load or create the ban list
